@@ -1,3 +1,23 @@
+// ---- START VEXCODE CONFIGURED DEVICES ----
+// Robot Configuration:
+// [Name]               [Type]        [Port(s)]
+// MiddleLeft           motor         1               
+// MiddleRight          motor         2               
+// FrontRight           motor         4               
+// BeltIntake2          motor         6               
+// BackRight            motor         12              
+// Piston               digital_out   B               
+// BackLeft             motor         11              
+// FrontLeft            motor         3               
+// BeltIntake           motor         10              
+// Controller1          controller                    
+// WallStack1           motor         16              
+// PositionSensor       limit         F               
+// IntakeMotor          motor         17              
+// Inertia              inertial      19              
+// SeeIt                optical       8               
+// DistanceSensor       distance      7               
+// ---- END VEXCODE CONFIGURED DEVICES ----
 // ---- START VEXCODE CONFIGUblue DEVICES ----
 // Robot Configuration:
 // [Name]               [Type]        [Port(s)]
@@ -275,25 +295,41 @@ void pre_auton() {
 
 void autonomous(void) {
   default_constants();
-  WallStack1.setBrake(hold);
+
 
   // Skills
   // WallStack1.spinToPosition(180, deg);
   IntakeMotor.spin(fwd, 100, percent);
-  chassis.drive_distance(-35, 0, 20, 0);
+  chassis.drive_distance(-45, 0, 20, 0);
   chassis.turn_to_angle(-90);
   chassis.drive_distance(30, 0, 5, 0);
   Piston.set(true);
-  BeltIntake.spin(fwd, 50, percent);
-  BeltIntake2.spin(fwd, 50, percent);
-  wait(1000,  msec);
+  wait(500, msec);
+  BeltIntake.spin(fwd, 100, percent);
+  BeltIntake2.spin(fwd, 100, percent);
   chassis.turn_to_angle(0);
-  chassis.drive_distance(-30, 0, 20, 0);
-  wait(1000,  msec);
-  chassis.turn_to_angle(180);
-  chassis.drive_distance(-40, 0, 20, 0);
-  wait(1000,  msec);
+  chassis.drive_distance(-60, 0, 20, 0);
+  chassis.turn_to_angle(130);
   chassis.drive_distance(-20, 0, 10, 0);
+  chassis.turn_to_angle(190);
+  chassis.drive_distance(-80, 0, 20, 0);
+  chassis.turn_to_angle(125);
+  chassis.drive_distance(-30, 0, 20, 0);
+  chassis.drive_distance(25, 0, 20, 0);
+  chassis.turn_to_angle(-60);
+  chassis.drive_distance(30, 0, 10, 0);
+    IntakeMotor.spin(fwd, 0, percent);
+  BeltIntake.spin(fwd, 0, percent);
+  BeltIntake2.spin(fwd, 0, percent);
+  Piston.set(false);
+  wait(500,  msec);
+  chassis.drive_distance(-60, 0, 20, 0);
+  chassis.turn_to_angle(210);
+     IntakeMotor.spin(fwd, 100, percent);
+  chassis.drive_distance(-50);
+  wait(500,  msec);
+  // chassis.drive_distance(90, 0, 20, 0);
+  // chassis.turn_to_angle(135);
 
   
   // chassis.drive_distance(20, 0, 5, 0);
@@ -470,19 +506,43 @@ void usercontrol(void) {
     // update your motors, etc.
     // ........................................................................
 
+if(!wantWallStack) {
+
   if(Controller1.ButtonR1.pressing()) {
+    if(wantWallStack && DistanceSensor.objectDistance(inches) <= 4) {
+
+        IntakeMotor.spin(fwd, 0, percent);
+        BeltIntake2.spin(fwd, 0, percent);
+        BeltIntake.spin(fwd, 0, percent);
+        wantWallStack = false;
+    } else {
+
         IntakeMotor.spin(fwd, 100, percent);
-        BeltIntake2.spin(fwd, 50, percent);
-        BeltIntake.spin(fwd, 50, percent);
+        BeltIntake2.spin(fwd, 100, percent);
+        BeltIntake.spin(fwd, 100, percent);
+    }
     } else if(Controller1.ButtonR2.pressing()){
       BeltIntake.spin(reverse, 100, percent);
-        BeltIntake2.spin(reverse, 40, percent);
-        IntakeMotor.spin(reverse, 40, percent);
+        BeltIntake2.spin(reverse, 50, percent);
+        IntakeMotor.spin(reverse, 50, percent);
     } else {
         IntakeMotor.spin(reverse, 0, percent);
         BeltIntake2.spin(fwd, 0, percent);
         BeltIntake.spin(fwd, 0, percent);
     }
+} else {
+  SeeIt.setLightPower(50);
+  
+        IntakeMotor.spin(fwd, 100, percent);
+        BeltIntake2.spin(fwd, 100, percent);
+        BeltIntake.spin(fwd, 100, percent);
+        if(SeeIt.color() == red) {
+          wantWallStack = false;
+              IntakeMotor.spin(fwd, 0, percent);
+        BeltIntake2.spin(fwd, 0, percent);
+        BeltIntake.spin(fwd, 0, percent);
+        }
+}
 
     if(Controller1.ButtonX.pressing()){
     wantWallStack = !wantWallStack;
@@ -498,7 +558,7 @@ void usercontrol(void) {
     }
 
     if(Controller1.ButtonUp.pressing()){
-      WallStack1.spinToPosition(350, degrees, 40, rpm);
+      WallStack1.spinToPosition(350, degrees, 60, rpm);
     }
 
     if(Controller1.ButtonL1.pressing()){

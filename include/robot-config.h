@@ -18,6 +18,7 @@ extern limit PositionSensor;
 extern motor IntakeMotor;
 extern inertial Inertia;
 extern optical SeeIt;
+extern distance DistanceSensor;
 
 /**
  * Used to initialize code/tasks/devices added using tools in VEXcode Pro.
