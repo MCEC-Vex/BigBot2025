@@ -17,8 +17,8 @@ extern motor WallStack1;
 extern limit PositionSensor;
 extern motor IntakeMotor;
 extern inertial Inertia;
-extern optical SeeIt;
 extern distance DistanceSensor;
+extern optical OpticalSensor;
 
 /**
  * Used to initialize code/tasks/devices added using tools in VEXcode Pro.

@@ -22,8 +22,8 @@ motor WallStack1 = motor(PORT16, ratio36_1, true);
 limit PositionSensor = limit(Brain.ThreeWirePort.F);
 motor IntakeMotor = motor(PORT17, ratio6_1, true);
 inertial Inertia = inertial(PORT19);
-optical SeeIt = optical(PORT8);
 distance DistanceSensor = distance(PORT7);
+optical OpticalSensor = optical(PORT8);
 
 // VEXcode generated functions
 // define variable for remote controller enable/disable

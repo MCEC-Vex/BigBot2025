@@ -15,99 +15,9 @@
 // PositionSensor       limit         F               
 // IntakeMotor          motor         17              
 // Inertia              inertial      19              
-// SeeIt                optical       8               
 // DistanceSensor       distance      7               
+// OpticalSensor        optical       8               
 // ---- END VEXCODE CONFIGURED DEVICES ----
-// ---- START VEXCODE CONFIGUblue DEVICES ----
-// Robot Configuration:
-// [Name]               [Type]        [Port(s)]
-// MiddleLeft           motor         1               
-// MiddleRight          motor         2               
-// FrontRight           motor         4               
-// BeltIntake2          motor         6               
-// BackRight            motor         12              
-// Piston               digital_out   B               
-// BackLeft             motor         11              
-// FrontLeft            motor         3               
-// BeltIntake           motor         10              
-// Controller1          controller                    
-// WallStack1           motor         16              
-// PositionSensor       limit         F               
-// IntakeMotor          motor         17              
-// Inertia              inertial      19              
-// SeeIt                optical       8               
-// ---- END VEXCODE CONFIGUblue DEVICES ----
-// ---- START VEXCODE CONFIGUblue DEVICES ----
-// Robot Configuration:
-// [Name]               [Type]        [Port(s)]
-// MiddleLeft           motor         1               
-// MiddleRight          motor         2               
-// FrontRight           motor         4               
-// BeltIntake2          motor         6               
-// BackRight            motor         12              
-// Piston               digital_out   B               
-// BackLeft             motor         11              
-// FrontLeft            motor         3               
-// BeltIntake           motor         10              
-// Controller1          controller                    
-// WallStack1           motor         16              
-// PositionSensor       limit         F               
-// IntakeMotor          motor         17              
-// Inertia              inertial      19              
-// ---- END VEXCODE CONFIGUblue DEVICES ----
-// ---- START VEXCODE CONFIGUblue DEVICES ----
-// Robot Configuration:
-// [Name]               [Type]        [Port(s)]
-// MiddleLeft           motor         1               
-// MiddleRight          motor         2               
-// FrontRight           motor         4               
-// BeltIntake2          motor         6               
-// BackRight            motor         12              
-// Piston               digital_out   B               
-// BackLeft             motor         11              
-// FrontLeft            motor         3               
-// BeltIntake           motor         10              
-// Controller1          controller                    
-// WallStack1           motor         16              
-// PositionSensor       limit         F               
-// IntakeReal           motor         17              
-// Inertia              inertial      19              
-// ---- END VEXCODE CONFIGUblue DEVICES ----
-// ---- START VEXCODE CONFIGUblue DEVICES ----
-// Robot Configuration:
-// [Name]               [Type]        [Port(s)]
-// MiddleLeft           motor         1               
-// MiddleRight          motor         2               
-// FrontRight           motor         4               
-// IntakeMotor          motor         6               
-// BackRight            motor         12              
-// Piston               digital_out   B               
-// BackLeft             motor         11              
-// FrontLeft            motor         3               
-// BeltIntake           motor         10              
-// Controller1          controller                    
-// WallStack1           motor         16              
-// PositionSensor       limit         F               
-// IntakeReal           motor         17              
-// Inertia              inertial      19              
-// ---- END VEXCODE CONFIGUblue DEVICES ----
-// ---- START VEXCODE CONFIGUblue DEVICES ----
-// Robot Configuration:
-// [Name]               [Type]        [Port(s)]
-// MiddleLeft           motor         1               
-// MiddleRight          motor         2               
-// FrontRight           motor         4               
-// IntakeMotor          motor         6               
-// BackRight            motor         12              
-// Piston               digital_out   B               
-// BackLeft             motor         11              
-// FrontLeft            motor         3               
-// BeltIntake           motor         10              
-// Controller1          controller                    
-// WallStack1           motor         16              
-// PositionSensor       limit         F               
-// IntakeReal           motor         17              
-// ---- END VEXCODE CONFIGUblue DEVICES ----
 
 
 //!BIG BOTTTT
@@ -284,6 +194,32 @@ void pre_auton() {
   }
 }
 
+int colorSortingTask() {
+  bool blueRingSpotted = false;
+  OpticalSensor.setLightPower(50);
+  while(true) {
+            if(OpticalSensor.isNearObject() && !blueRingSpotted){
+        if(OpticalSensor.hue() <= 230 && OpticalSensor.hue() >= 100) {
+        Controller1.rumble(".");
+        IntakeMotor.spin(reverse, 100, percent);
+        BeltIntake2.spin(reverse, 100, percent);
+        BeltIntake.spin(reverse, 100, percent);
+        wait(100, msec);
+
+        IntakeMotor.spin(fwd, 100, percent);
+        BeltIntake2.spin(fwd, 100, percent);
+        BeltIntake.spin(fwd, 100, percent);
+        blueRingSpotted = true;
+        wait(200, msec);
+        blueRingSpotted = false;
+        }
+            }
+    wait(20, msec); // Small delay to prevent hogging CPU
+  }
+  return 0;
+}
+
+
 /**
  * Auton function, which runs the selected auton. Case 0 is the default,
  * 
@@ -294,187 +230,89 @@ void pre_auton() {
 
 
 void autonomous(void) {
-  default_constants();
+ default_constants();
+ vex::task sortTask(colorSortingTask);
+ 
+ IntakeMotor.spin(fwd, 100, percent);
+ chassis.drive_distance(-45);
+ chassis.turn_to_angle(-90);
+ chassis.drive_distance(28, 0, 5, 0);
+ Piston.set(true);
+ wait(500, msec);
+ BeltIntake2.spin(fwd, 100, percent);
+ BeltIntake.spin(fwd, 100, percent);
+ chassis.turn_to_angle(180);
+ chassis.drive_distance(-30);
+ chassis.turn_to_angle(135);
+ chassis.drive_distance(-18);
+ chassis.drive_distance(18);
+ chassis.turn_to_angle(-90);
+ chassis.drive_distance(-50);
+ chassis.drive_distance(50);
+ chassis.turn_to_angle(0);
+ chassis.drive_distance(-50, 0, 10, 0);
+ wait(100, msec);
+ chassis.turn_to_angle(90);
+ chassis.drive_distance(-10, 0, 10, 0);
+ wait(50, msec);
+ chassis.drive_distance(10, 0, 10, 0);
+ chassis.turn_to_angle(0);
+ chassis.drive_distance(50);
+ BeltIntake2.stop();
+ BeltIntake.stop();
+ IntakeMotor.stop();
+ chassis.turn_to_angle(-45);
+ chassis.drive_distance(20, 0, 5, 0);
+ Piston.set(false);
+ wait(100, msec);
+ chassis.drive_distance(-25);
+ chassis.turn_to_angle(0);
+ IntakeMotor.spin(fwd, 100, percent);
+ chassis.drive_distance(-80);
+ chassis.turn_to_angle(90);
+ chassis.drive_distance(25, 0, 5, 0);
+ Piston.set(true);
+ wait(500, msec);
+ chassis.turn_to_angle(0);
+ 
+ BeltIntake2.spin(fwd, 100, percent);
+ BeltIntake.spin(fwd, 100, percent);
+ chassis.drive_distance(-30);
+ chassis.turn_to_angle(90);
+ chassis.drive_distance(-30, 0 , 10, 0);
+chassis.turn_to_angle(45);
+ chassis.drive_distance(-23, 0 , 5, 0);
+ chassis.drive_distance(10, 0, 5, 0);
+ chassis.drive_distance(-10, 0, 5, 0);
+ chassis.drive_distance(23, 0, 5, 0);
+ chassis.turn_to_angle(-135);
+ chassis.drive_distance(25, 0, 5, 0);
+  BeltIntake2.stop();
+ BeltIntake.stop();
+ IntakeMotor.stop();
+ Piston.set(false);
+ chassis.drive_distance(-25, 0, 5, 0);
+ chassis.turn_to_angle(90);
+ IntakeMotor.spin(fwd, 100, percent);
+ chassis.drive_distance(-25);
+ chassis.drive_distance(20, 0, 5, 0);
+ Piston.set(true);
+ wait(200,msec);
+ chassis.drive_distance(-20);
+ chassis.turn_to_angle(-45);
+ BeltIntake2.spin(fwd, 100, percent);
+ BeltIntake.spin(fwd, 100, percent);
+ chassis.drive_distance(-20);
+ chassis.drive_distance(40);
+ chassis.turn_to_angle(-135);
+   BeltIntake2.stop();
+ BeltIntake.stop();
+ chassis.drive_distance(-50);
+ BeltIntake2.spin(fwd, 100, percent);
+ BeltIntake.spin(fwd, 100, percent);
 
-
-  // Skills
-  // WallStack1.spinToPosition(180, deg);
-  IntakeMotor.spin(fwd, 100, percent);
-  chassis.drive_distance(-45, 0, 20, 0);
-  chassis.turn_to_angle(-90);
-  chassis.drive_distance(30, 0, 5, 0);
-  Piston.set(true);
-  wait(500, msec);
-  BeltIntake.spin(fwd, 100, percent);
-  BeltIntake2.spin(fwd, 100, percent);
-  chassis.turn_to_angle(0);
-  chassis.drive_distance(-60, 0, 20, 0);
-  chassis.turn_to_angle(130);
-  chassis.drive_distance(-20, 0, 10, 0);
-  chassis.turn_to_angle(190);
-  chassis.drive_distance(-80, 0, 20, 0);
-  chassis.turn_to_angle(125);
-  chassis.drive_distance(-30, 0, 20, 0);
-  chassis.drive_distance(25, 0, 20, 0);
-  chassis.turn_to_angle(-60);
-  chassis.drive_distance(30, 0, 10, 0);
-    IntakeMotor.spin(fwd, 0, percent);
-  BeltIntake.spin(fwd, 0, percent);
-  BeltIntake2.spin(fwd, 0, percent);
-  Piston.set(false);
-  wait(500,  msec);
-  chassis.drive_distance(-60, 0, 20, 0);
-  chassis.turn_to_angle(210);
-     IntakeMotor.spin(fwd, 100, percent);
-  chassis.drive_distance(-50);
-  wait(500,  msec);
-  // chassis.drive_distance(90, 0, 20, 0);
-  // chassis.turn_to_angle(135);
-
-  
-  // chassis.drive_distance(20, 0, 5, 0);
-  // Piston.set(true);
-  // wait(500, msec);
-  // chassis.turn_to_angle(-15);
-  // IntakeMotor.spin(fwd,100, percent);
-  // chassis.drive_distance(-40, 0, 30, 0);
-  //       SeeIt.setLightPower(50, percent);
-  //     // for blue make it blue
-  //       if(SeeIt.color() == blue ){
-  //       IntakeMotor.spin(fwd, 100, percent);
-  //       BeltIntake2.spin(fwd, 100, percent);
-  //       BeltIntake.spin(fwd, 100, percent);
-  //       wait(500, msec);
-  //     // Test.spin(fwd, 100, percent);
-  //   } else {
-
-  //       IntakeMotor.spin(fwd, 100, percent);
-  //       BeltIntake2.spin(fwd, 50, percent);
-  //       BeltIntake.spin(fwd, 50, percent);
-  //     // Test.spin(fwd, 0, percent);
-  //   }
-  // chassis.drive_distance(-20, 0, 30, 0);
-  // chassis.turn_to_angle(155);
-  // chassis.drive_distance(-50, 0, 30, 0);
-  //         SeeIt.setLightPower(50, percent);
-  //     // for blue make it blue
-  //       if(SeeIt.color() == blue && SeeIt.isNearObject()) {
-  //       IntakeMotor.spin(fwd, 100, percent);
-  //       BeltIntake2.spin(fwd, 100, percent);
-  //       BeltIntake.spin(fwd, 100, percent);
-  //       wait(500, msec);
-  //     // Test.spin(fwd, 100, percent);
-  //   } else {
-
-  //       IntakeMotor.spin(fwd, 100, percent);
-  //       BeltIntake2.spin(fwd, 50, percent);
-  //       BeltIntake.spin(fwd, 50, percent);
-  //     // Test.spin(fwd, 0, percent);
-  //   }
-  // chassis.drive_distance(-20, 0, 5, 0);
-  // Inertia.calibrate();
-  // chassis.drive_distance(20, 0, 30, 0);
-  //         SeeIt.setLightPower(50, percent);
-  //     // for blue make it blue
-  //       if(SeeIt.color() == blue && SeeIt.isNearObject()) {
-  //       IntakeMotor.spin(fwd, 100, percent);
-  //       BeltIntake2.spin(fwd, 100, percent);
-  //       BeltIntake.spin(fwd, 100, percent);
-  //       wait(500, msec);
-  //     // Test.spin(fwd, 100, percent);
-  //   } else {
-
-  //       IntakeMotor.spin(fwd, 100, percent);
-  //       BeltIntake2.spin(fwd, 50, percent);
-  //       BeltIntake.spin(fwd, 50, percent);
-  //     // Test.spin(fwd, 0, percent);
-  //   }
-  //   wait(1, sec);
-  // chassis.turn_to_angle(180);
-  // chassis.drive_distance(-30, 0, 10, 0);
-  //         SeeIt.setLightPower(50, percent);
-  //     // for blue make it blue
-  //       if(SeeIt.color() == blue && SeeIt.isNearObject()) {
-  //       IntakeMotor.spin(fwd, 100, percent);
-  //       BeltIntake2.spin(fwd, 100, percent);
-  //       BeltIntake.spin(fwd, 100, percent);
-  //       wait(500, msec);
-  //     // Test.spin(fwd, 100, percent);
-  //   } else {
-
-  //       IntakeMotor.spin(fwd, 100, percent);
-  //       BeltIntake2.spin(fwd, 50, percent);
-  //       BeltIntake.spin(fwd, 50, percent);
-  //     // Test.spin(fwd, 0, percent);
-  //   }
-  //   wait(1, sec);
-  // chassis.turn_to_angle(-80);
-  // chassis.drive_distance(50, 0, 10, 0);
-  // chassis.drive_distance(30, 0, 5, 0);
-  //           SeeIt.setLightPower(50, percent);
-  //     // for blue make it blue
-  //       if(SeeIt.color() == blue && SeeIt.isNearObject()) {
-  //       IntakeMotor.spin(fwd, 100, percent);
-  //       BeltIntake2.spin(fwd, 100, percent);
-  //       BeltIntake.spin(fwd, 100, percent);
-  //       wait(500, msec);
-  //     // Test.spin(fwd, 100, percent);
-  //   } else {
-
-  //       IntakeMotor.spin(fwd, 100, percent);
-  //       BeltIntake2.spin(fwd, 50, percent);
-  //       BeltIntake.spin(fwd, 50, percent);
-  //     // Test.spin(fwd, 0, percent);
-  //   }
-  // chassis.drive_distance(20, 0, 5, 0);
-  // chassis.turn_to_angle(-100);
-  // chassis.drive_distance(30, 0, 10, 0);
-
-
-
-    // wait(200, msec);
-    // chassis.turn_to_angle(-30);
-    // chassis.drive_distance(-40);
-    // chassis.drive_to_point(0, 60);
-    // chassis.turn_to_angle(45);
-    //   IntakeMotor.spin(fwd, 100, percent);
-    // chassis.set_coordinates(0, 0, 0);
-    // chassis.drive_distance(-43);
-    // wait(200, msec);
-    // chassis.turn_to_angle(60);
-    // chassis.drive_distance(-25);
-    // wait(200, msec);
-    // chassis.turn_to_angle(-45);
-    // chassis.turn_to_angle(-90);
-  // auto_started = true;
-//   switch(current_auton_selection){ 
-//     case 0:
-//       drive_test();
-//       break;
-//     case 1:         
-//       drive_test();
-//       break;
-//     case 2:
-//       turn_test();
-//       break;
-//     case 3:
-//       swing_test();
-//       break;
-//     case 4:
-//       full_test();
-//       break;
-//     case 5:
-//       odom_test();
-//       break;
-//     case 6:
-//       tank_odom_test();
-//       break;
-//     case 7:
-//       holonomic_odom_test();
-//       break;
-//  }
+//  Brain.Screen.printAt(5, 160, "%f", Brain.Timer <= 10000);
 }
-
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
 /*                              User Control Task                            */
@@ -494,6 +332,8 @@ void usercontrol(void) {
   bool PistonOpen = false;
   Piston.set(false);
   bool wantWallStack = false;
+  int power = 100;
+  bool blueRingSpotted = false;
 
   // User control code here, inside the loop
   while (1) {
@@ -505,44 +345,47 @@ void usercontrol(void) {
     // Insert user code here. This is where you use the joystick values to
     // update your motors, etc.
     // ........................................................................
+        if(Brain.Timer >= 29500 && Brain.Timer <= 30000){
+      Controller1.rumble("....");
+    }
+        if(Brain.Timer >= 44500 && Brain.Timer <= 45000){
+      Controller1.rumble("...");
+    }
+        if(Brain.Timer >= 49500 && Brain.Timer <= 50000){
+      Controller1.rumble("...");
+    }
 
-if(!wantWallStack) {
-
-  if(Controller1.ButtonR1.pressing()) {
-    if(wantWallStack && DistanceSensor.objectDistance(inches) <= 4) {
-
-        IntakeMotor.spin(fwd, 0, percent);
-        BeltIntake2.spin(fwd, 0, percent);
-        BeltIntake.spin(fwd, 0, percent);
-        wantWallStack = false;
-    } else {
+    OpticalSensor.setLightPower(50);
+  if(Controller1.ButtonR1.pressing()) {  
+        IntakeMotor.spin(fwd, power, percent);
+        BeltIntake2.spin(fwd, power, percent);
+        BeltIntake.spin(fwd, power, percent);
+        if(OpticalSensor.isNearObject() && !blueRingSpotted){
+        if(OpticalSensor.hue() <= 230 && OpticalSensor.hue() >= 100) {
+        Controller1.rumble(".");
+        IntakeMotor.spin(reverse, 100, percent);
+        BeltIntake2.spin(reverse, 100, percent);
+        BeltIntake.spin(reverse, 100, percent);
+        wait(100, msec);
 
         IntakeMotor.spin(fwd, 100, percent);
         BeltIntake2.spin(fwd, 100, percent);
         BeltIntake.spin(fwd, 100, percent);
-    }
+        blueRingSpotted = true;
+        wait(200, msec);
+        blueRingSpotted = false;
+        }
+        }
     } else if(Controller1.ButtonR2.pressing()){
       BeltIntake.spin(reverse, 100, percent);
         BeltIntake2.spin(reverse, 50, percent);
         IntakeMotor.spin(reverse, 50, percent);
     } else {
+
         IntakeMotor.spin(reverse, 0, percent);
         BeltIntake2.spin(fwd, 0, percent);
         BeltIntake.spin(fwd, 0, percent);
     }
-} else {
-  SeeIt.setLightPower(50);
-  
-        IntakeMotor.spin(fwd, 100, percent);
-        BeltIntake2.spin(fwd, 100, percent);
-        BeltIntake.spin(fwd, 100, percent);
-        if(SeeIt.color() == red) {
-          wantWallStack = false;
-              IntakeMotor.spin(fwd, 0, percent);
-        BeltIntake2.spin(fwd, 0, percent);
-        BeltIntake.spin(fwd, 0, percent);
-        }
-}
 
     if(Controller1.ButtonX.pressing()){
     wantWallStack = !wantWallStack;
@@ -585,6 +428,7 @@ if(!wantWallStack) {
 int main() {
   Piston.set(false);
   WallStack1.setBrake(hold);
+
   // Set up callbacks for autonomous and driver control periods.
   Competition.autonomous(autonomous);
   Competition.drivercontrol(usercontrol);
