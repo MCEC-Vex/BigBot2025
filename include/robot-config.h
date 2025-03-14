@@ -14,7 +14,7 @@ extern motor FrontLeft;
 extern motor BeltIntake;
 extern controller Controller1;
 extern motor WallStack1;
-extern limit PositionSensor;
+extern limit goalChecker;
 extern motor IntakeMotor;
 extern inertial Inertia;
 extern distance DistanceSensor;
