@@ -1,108 +1,7 @@
-// ---- START VEXCODE CONFIGURED DEVICES ----
-// Robot Configuration:
-// [Name]               [Type]        [Port(s)]
-// MiddleLeft           motor         1               
-// MiddleRight          motor         2               
-// FrontRight           motor         4               
-// BeltIntake2          motor         6               
-// BackRight            motor         12              
-// Piston               digital_out   B               
-// BackLeft             motor         11              
-// FrontLeft            motor         3               
-// BeltIntake           motor         10              
-// Controller1          controller                    
-// WallStack1           motor         16              
-// goalChecker          limit         C               
-// IntakeMotor          motor         17              
-// Inertia              inertial      19              
-// DistanceSensor       distance      7               
-// OpticalSensor        optical       8               
-// ---- END VEXCODE CONFIGURED DEVICES ----
-// ---- START VEXCODE CONFIGURED DEVICES ----
-// Robot Configuration:
-// [Name]               [Type]        [Port(s)]
-// MiddleLeft           motor         1               
-// MiddleRight          motor         2               
-// FrontRight           motor         4               
-// BeltIntake2          motor         6               
-// BackRight            motor         12              
-// Piston               digital_out   B               
-// BackLeft             motor         11              
-// FrontLeft            motor         3               
-// BeltIntake           motor         10              
-// Controller1          controller                    
-// WallStack1           motor         16              
-// goalChecker          limit         F               
-// IntakeMotor          motor         17              
-// Inertia              inertial      19              
-// DistanceSensor       distance      7               
-// OpticalSensor        optical       8               
-// ---- END VEXCODE CONFIGURED DEVICES ----
-// ---- START VEXCODE CONFIGURED DEVICES ----
-// Robot Configuration:
-// [Name]               [Type]        [Port(s)]
-// MiddleLeft           motor         1               
-// MiddleRight          motor         2               
-// FrontRight           motor         4               
-// BeltIntake2          motor         6               
-// BackRight            motor         12              
-// Piston               digital_out   B               
-// BackLeft             motor         11              
-// FrontLeft            motor         3               
-// BeltIntake           motor         10              
-// Controller1          controller                    
-// WallStack1           motor         16              
-// goalChecker          limit         F               
-// IntakeMotor          motor         17              
-// Inertia              inertial      19              
-// DistanceSensor       distance      7               
-// OpticalSensor        optical       8               
-// GoalChecker          bumper        C               
-// ---- END VEXCODE CONFIGURED DEVICES ----
-// ---- START VEXCODE CONFIGURED DEVICES ----
-// Robot Configuration:
-// [Name]               [Type]        [Port(s)]
-// MiddleLeft           motor         1               
-// MiddleRight          motor         2               
-// FrontRight           motor         4               
-// BeltIntake2          motor         6               
-// BackRight            motor         12              
-// Piston               digital_out   B               
-// BackLeft             motor         11              
-// FrontLeft            motor         3               
-// BeltIntake           motor         10              
-// Controller1          controller                    
-// WallStack1           motor         16              
-// goalChecker          limit         F               
-// IntakeMotor          motor         17              
-// Inertia              inertial      19              
-// DistanceSensor       distance      7               
-// OpticalSensor        optical       8               
-// ---- END VEXCODE CONFIGURED DEVICES ----
-// ---- START VEXCODE CONFIGURED DEVICES ----
-// Robot Configuration:
-// [Name]               [Type]        [Port(s)]
-// MiddleLeft           motor         1               
-// MiddleRight          motor         2               
-// FrontRight           motor         4               
-// BeltIntake2          motor         6               
-// BackRight            motor         12              
-// Piston               digital_out   B               
-// BackLeft             motor         11              
-// FrontLeft            motor         3               
-// BeltIntake           motor         10              
-// Controller1          controller                    
-// WallStack1           motor         16              
-// PositionSensor       limit         F               
-// IntakeMotor          motor         17              
-// Inertia              inertial      19              
-// DistanceSensor       distance      7               
-// OpticalSensor        optical       8               
-// ---- END VEXCODE CONFIGURED DEVICES ----
-
-
 //!BIG BOTTTT
 #include "vex.h"
+
+motor_group Belt(BeltIntake, BeltIntake2);
 
 using namespace vex;
 competition Competition;
@@ -301,128 +200,155 @@ int colorSortingTask() {
   return 0;
 }
 
+// bool makeSpin = true;
+// bool spinningMode = false;
 
-/**
- * Auton function, which runs the selected auton. Case 0 is the default,
- * 
- * and will run in the brain screen goes untouched during preauton. Replace
- * drive_test(), for example, with your own auton function you created in
- * autons.cpp and declablue in autons.h.
- */
+// int BeltIsStuckHelpIt() {
+//   wait(100, msec);
+//   while(true) {
+//     // Check if motor is spinnningMode
+//     if(spinningMode) {
+//     // Check if motor is running but moving too slowly
+//     if (Belt.voltage() != 0 && std::abs(Belt.velocity(percent)) < 25) {
+//       // Motor is likely stuck - run the unstuck sequence
+//       Belt.spin(reverse, 50, percent);
+//       IntakeMotor.spin(reverse, 50, percent);
+//       wait(300, msec);
+      
+//       // Resume forward motion
+//       Belt.spin(fwd, 100, percent);
+//       IntakeMotor.spin(fwd, 100, percent);
+      
+//       // Add a cooldown period - give motor time to recover
+//       wait(1000, msec);
+//     }
+    
+//     wait(100, msec);  // Regular check interval
+//   }
+//     }
+  
+//   return 0;
+// }
 
-   int dis = 0;
-   int times = 0;
- void checkIfGoalIsPositioned(){
-   if(times >= 1) return;
-   if(goalChecker.pressing()) {
-     Piston.set(true);
-   } else {
-     dis += 10;
-     times++;
-     chassis.drive_distance(dis, 0, 5, 0);
-     checkIfGoalIsPositioned();
-   }
- }
-   
+bool toSpin = false;
+
+int ConveyorSpin() {
+  while(true) {
+    if(toSpin) {
+      Belt.spin(fwd, 100, percent);
+      
+      wait(200, msec);
+      if(std::abs(BeltIntake.velocity(percent)) == 0) {
+        BeltIntake.spinFor(reverse, 80, degrees);
+        BeltIntake2.spinFor(reverse, 80, degrees);
+      }
+    } else {
+      Belt.stop();
+      wait(200, msec);
+    }
+  }
+  return 0; // Will never reach this point
+}
 
 void autonomous(void) {
- default_constants();
- vex::task sortTask(colorSortingTask);
- 
- IntakeMotor.spin(fwd, 100, percent);
- BeltIntake.stop();
- BeltIntake2.stop();
- chassis.drive_distance(-45);
- chassis.turn_to_angle(-90);
- chassis.drive_distance(35, 0, 5, 0);
- checkIfGoalIsPositioned();
-     Piston.set(true);
- wait(300, msec);
- chassis.drive_distance(-dis);
- dis = 0;
- times = 0;
- chassis.drive_distance(-5, 0 ,5, 0);
+  default_constants();
+  vex::task sortTask(colorSortingTask);
+  // vex::task spinTask(ConveyorSpin);
+  
+  IntakeMotor.spin(fwd, 100, percent);
+  Belt.stop();
+  
+  // First goal sequence
+  chassis.drive_distance(-45, 0, 10, 0);
+  chassis.turn_to_angle(-90);
+  chassis.drive_distance(35, 0, 5, 0);
+  Piston.set(true);
+  wait(300, msec);
+  chassis.drive_distance(-5, -90, 5, 5);
+  
+      Belt.spin(fwd, 100, percent);
 
- BeltIntake2.spin(fwd, 100, percent);
- BeltIntake.spin(fwd, 100, percent);
- chassis.turn_to_angle(180);
- chassis.drive_distance(-30);
- chassis.turn_to_angle(135);
- chassis.drive_distance(-15);
- chassis.drive_distance(18);
- chassis.turn_to_angle(-90);
- chassis.drive_distance(-50);
- chassis.drive_distance(50);
- chassis.turn_to_angle(0);
- chassis.drive_distance(-50, 0, 10, 0);
- wait(100, msec);
+  
+  chassis.turn_to_angle(180);
+  chassis.drive_distance(-30, 180);
+  chassis.turn_to_angle(135);
+  chassis.drive_distance(-15, 135);
+  chassis.drive_distance(18, 135);
+  chassis.turn_to_angle(-90);
+  chassis.drive_distance(-50, -90);
+  chassis.drive_distance(50, -90);
+  chassis.turn_to_angle(0);
+  chassis.drive_distance(-50, 0);
+  wait(100, msec);
   chassis.drive_distance(20);
- chassis.turn_to_angle(30);
- chassis.drive_distance(-20, 0 , 10, 0);
- chassis.drive_distance(20);
- chassis.turn_to_angle(0);
- chassis.drive_distance(30);
- BeltIntake2.stop();
- BeltIntake.stop();
- IntakeMotor.stop();
- chassis.turn_to_angle(-45);
- chassis.drive_distance(20, 0, 5, 0);
- Piston.set(false);
- wait(100, msec);
- chassis.drive_distance(-20);
- chassis.turn_to_angle(0);
- IntakeMotor.spin(fwd, 100, percent);
- chassis.drive_distance(-85);
- chassis.turn_to_angle(90);
- chassis.drive_distance(30, 0, 5, 0);
-  checkIfGoalIsPositioned();
+  chassis.turn_to_angle(30);
+  chassis.drive_distance(-20, 0, 10, 0);
+  chassis.drive_distance(20);
+  chassis.turn_to_angle(0);
+  chassis.drive_distance(30);
   
-     Piston.set(true);
- wait(300, msec);
- chassis.drive_distance(-dis);
- dis = 0;
- times = 0;
- chassis.turn_to_angle(0);
- 
- BeltIntake2.spin(fwd, 100, percent);
- BeltIntake.spin(fwd, 100, percent);
- chassis.drive_distance(-27);
- chassis.turn_to_angle(90);
- chassis.drive_distance(-30, 0 , 10, 0);
-chassis.turn_to_angle(45);
- chassis.drive_distance(-20, 0 , 5, 0);
- wait(300, msec);
- chassis.drive_distance(20, 0, 5, 0);
- chassis.turn_to_angle(-135);
- chassis.drive_distance(25, 0, 5, 0);
-  BeltIntake2.stop();
- BeltIntake.stop();
- IntakeMotor.stop();
- Piston.set(false);
- chassis.drive_distance(-25, 0, 5, 0);
- chassis.turn_to_angle(90);
- IntakeMotor.spin(fwd, 100, percent);
-BeltIntake2.spin(fwd, 5, percent);
- BeltIntake.spin(fwd, 5, percent);
- chassis.drive_distance(30);
- chassis.drive_distance(20, 0, 5, 0);
-  checkIfGoalIsPositioned();
+      Belt.stop();
+
   
-     Piston.set(true);
- wait(200,msec);
- chassis.drive_distance(-dis);
- dis = 0;
- times = 0;
- chassis.drive_distance(-25);
- chassis.turn_to_angle(-45);
- BeltIntake2.spin(fwd, 100, percent);
- BeltIntake.spin(fwd, 100, percent);
- chassis.drive_distance(-20);
- chassis.drive_distance(40);
+  Belt.stop();
+  IntakeMotor.stop();
+  chassis.turn_to_angle(-45);
+  chassis.drive_distance(20, 0, 5, 0);
+  Piston.set(false);
+  wait(100, msec);
+  chassis.drive_distance(-20);
+  chassis.turn_to_angle(0);
+  IntakeMotor.spin(fwd, 100, percent);
+  chassis.drive_distance(-85, 0, 10, 5);
+  chassis.turn_to_angle(90);
+  chassis.drive_distance(32, 0, 5, 0);
+  Piston.set(true);
+  chassis.drive_distance(-4, 90, 5, 3);
+  wait(300, msec);
+  chassis.turn_to_angle(0);
+  
+      Belt.spin(fwd, 100, percent);
 
-
-//  Brain.Screen.printAt(5, 160, "%f", Brain.Timer <= 10000);
-}
+  
+  Belt.spin(fwd, 100, percent);
+  chassis.drive_distance(-27);
+  chassis.turn_to_angle(90);
+  chassis.drive_distance(-30, 0, 10, 0);
+  chassis.turn_to_angle(45);
+  chassis.drive_distance(-25, 45, 3, 5);
+  Belt.spin(reverse, 100, percent);
+  wait(300, msec);
+  Belt.spin(fwd, 100, percent);
+  chassis.drive_distance(10, 45, 3, 5);
+  chassis.drive_distance(-10, 45, 3, 5);
+  chassis.drive_distance(25, 45, 3, 5);
+  chassis.turn_to_angle(-135);
+  chassis.drive_distance(25, 0, 5, 0);
+  
+      Belt.stop();  
+  IntakeMotor.stop();
+  Piston.set(false);
+  chassis.drive_distance(-20, 0, 5, 0);
+  chassis.turn_to_angle(90);
+  
+      Belt.spin(fwd, 100, percent);
+  
+  
+  IntakeMotor.spin(fwd, 100, percent);
+  chassis.drive_distance(30);
+  chassis.drive_distance(20, 0, 5, 0);
+  Piston.set(true);
+  wait(200, msec);
+  Belt.spin(fwd, 5, percent);
+  chassis.drive_distance(-25);
+  chassis.turn_to_angle(-50);
+  BeltIntake2.spin(fwd, 100, percent);
+  BeltIntake.spin(fwd, 100, percent);
+  chassis.drive_distance(-25);
+  chassis.drive_distance(20);
+  chassis.turn_to_angle(-90);
+  chassis.drive_distance(-40);
+  }
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
 /*                              User Control Task                            */
@@ -447,29 +373,26 @@ void usercontrol(void) {
     // Insert user code here. This is where you use the joystick values to
     // update your motors, etc.
     // ........................................................................
-    //     if(Brain.Timer >= 29500 && Brain.Timer <= 30000){
-    //   Controller1.rumble("....");
-    // }
-    //     if(Brain.Timer >= 44500 && Brain.Timer <= 45000){
-    //   Controller1.rumble("...");
-    // }
-    //     if(Brain.Timer >= 49500 && Brain.Timer <= 50000){
-    //   Controller1.rumble("...");
-    // }
+        if(Brain.Timer >= 29500 && Brain.Timer <= 30000){
+      Controller1.rumble("....");
+    }
+        if(Brain.Timer >= 44500 && Brain.Timer <= 45000){
+      Controller1.rumble("...");
+    }
+        if(Brain.Timer >= 49500 && Brain.Timer <= 50000){
+      Controller1.rumble("...");
+    }
   if(Controller1.ButtonR1.pressing()) {
         IntakeMotor.spin(fwd, 100, percent);
-        BeltIntake2.spin(fwd, 100, percent);
-        BeltIntake.spin(fwd, 100, percent);
+        Belt.spin(fwd, 100, percent);
     } else if(Controller1.ButtonR2.pressing()){
-      BeltIntake.spin(reverse, 100, percent);
-        BeltIntake2.spin(reverse, 100, percent);
+      Belt.spin(reverse, 100, percent);
         IntakeMotor.spin(reverse, 100, percent);
     } else {
 
         IntakeMotor.spin(reverse, 0, percent);
-        BeltIntake2.spin(fwd, 0, percent);
-        BeltIntake.spin(fwd, 0, percent);
-    }
+        Belt.stop();
+}
 
     // Control intake motor manually
   
@@ -481,15 +404,6 @@ void usercontrol(void) {
 
     if(Controller1.ButtonUp.pressing()){
       WallStack1.spinToPosition(350, degrees, 60, rpm);
-    }
-
-    if(Controller1.ButtonL1.pressing()){
-      WallStack1.spin(fwd, 100, percent);
-
-    } else if(Controller1.ButtonL2.pressing()){
-      WallStack1.spin(reverse, 100, percent);
-    } else {
-      WallStack1.stop();
     }
 
     //Replace this line with chassis.control_tank(); for tank drive 
